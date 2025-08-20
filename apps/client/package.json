@@ -1,0 +1,21 @@
+{
+  "name": "@mediasoup-tutorial/client",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "parcel ./public/index.html",
+    "build": "parcel build ./public/index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "mediasoup-client": "^3.15.2"
+  },
+  "devDependencies": {
+    "parcel": "^2.15.4"
+  }
+}

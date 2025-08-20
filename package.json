@@ -1,0 +1,18 @@
+{
+  "name": "mediasoup-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "client": "pnpm --filter @mediasoup-tutorial/client",
+    "server": "pnpm --filter @mediasoup-tutorial/server",
+    "dev": "pnpm --recursive --parallel --stream run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

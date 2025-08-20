@@ -1,0 +1,15 @@
+{
+  "name": "@mediasoup-tutorial/event",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "mediasoup": "^3.18.0"
+  }
+}

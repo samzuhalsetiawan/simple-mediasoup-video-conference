@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="./style.css">
+   <title>Document</title>
+</head>
+<body>
+   <div class="container">
+      <div class="local-container">
+         <div class="video-container">
+            <span class="display-name">Anonymous</span>
+            <video class="local-video" autoplay></video>
+         </div>
+         <div class="button-container">
+            <button id="btn-share-camera">Share Camera</button>
+            <button id="btn-share-screen">Share Screen</button>
+         </div>
+      </div>
+      <div class="remote-container"></div>
+      <div class="overlay">
+         <button id="btn-start-app">Start App</button>
+      </div>
+   </div>
+   <script type="module" src="../src/index.ts"></script>
+</body>
+</html>
