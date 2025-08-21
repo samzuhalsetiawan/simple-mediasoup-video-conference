@@ -145,6 +145,7 @@ const onSocketDisconnected = (socket: WebSocket) => {
       if (client === socket) return;
       client.sendEvent("SOCKET_LEFT", { socketId: socket.id });
    });
+   mediasoupServer.onSocketDisconnect(socket);
    console.log(`[Socket Disconnected] ${socket.id}`);
 }
 

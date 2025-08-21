@@ -173,5 +173,14 @@ export class MediasoupServer {
             });
          });
    }
+
+   public onSocketDisconnect(socket: WebSocket) {
+      this.router.appData.sendTransports
+         .filter(sendTransport => sendTransport.appData.socket === socket)
+         .forEach(sendTransport => sendTransport.close());
+      this.router.appData.recvTransports
+         .filter(recvTransport => recvTransport.appData.socket === socket)
+         .forEach(recvTransport => recvTransport.close());
+   }
 }
 

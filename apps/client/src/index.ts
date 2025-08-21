@@ -72,6 +72,7 @@ async function main() {
       const participant = participants.find(p => p.socketId === data.socketId);
       if (!participant) return;
       participants.splice(participants.indexOf(participant), 1);
+      document.getElementById(data.socketId)?.remove();
    }
 
    const showRemoteVideo = (id: string) => {
@@ -81,6 +82,7 @@ async function main() {
       const divVideoContainer = document.createElement("div") as HTMLDivElement;
       const spanDisplayName = document.createElement("span") as HTMLHeadingElement;
       const videoRemoteVideo = document.createElement("video") as HTMLVideoElement;
+      divVideoContainer.id = id;
       divVideoContainer.classList.add("video-container");
       spanDisplayName.classList.add("display-name");
       spanDisplayName.innerText = id;
