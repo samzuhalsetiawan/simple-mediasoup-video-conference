@@ -25,5 +25,8 @@ The server run in port 3000, you can open the web in http://localhost:1234/ (Par
 ## Screenshot
 [![Screenshot-from-2025-08-21-21-33-47-edited.png](https://i.postimg.cc/pdDy5Nkb/Screenshot-from-2025-08-21-21-33-47-edited.png)](https://postimg.cc/5H2fDRZn)
 
+## How do i make it?
+You can read my [medium](https://medium.com/@samzuhalsetiawan/membuat-web-based-real-time-video-conference-app-menggunakan-mediasoup-library-a60011da43f8) article.
+
 ## License
 Do whatever you like
