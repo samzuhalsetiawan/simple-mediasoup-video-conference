@@ -34,6 +34,18 @@ const onMessage = (socket: WebSocket, message: any) => {
       case "REQUEST_ROUTER_RTP_CAPABILITIES":
          onRequestRouterRtpCapabilities(socket, event.data);
          break;
+      case "CREATE_SEND_TRANSPORT":
+         onCreateSendTransport(socket, event.data);
+         break;
+      case "CONNECT_SEND_TRANSPORT":
+         onConnectSendTransport(socket, event.data);
+         break;
+      case "CREATE_RECV_TRANSPORT":
+         onCreateRecvTransport(socket, event.data);
+         break;
+      case "CONNECT_RECV_TRANSPORT":
+         onConnectRecvTransport(socket, event.data);
+         break;
    }
 }
 
@@ -42,6 +54,48 @@ const onRequestRouterRtpCapabilities = (
    data: ClientEventData<"REQUEST_ROUTER_RTP_CAPABILITIES">
 ) => {
    socket.sendEvent("UPDATE_ROUTER_RTP_CAPABILITIES", { routerRtpCapabilities: mediasoupServer.rtpCapabilities });
+}
+
+const onCreateSendTransport = async (
+   socket: WebSocket,
+   data: ClientEventData<"CREATE_SEND_TRANSPORT">
+) => {
+   const sendTransport = await mediasoupServer.createSendTransport(socket);
+   socket.sendEvent("SEND_TRANSPORT_CREATED", {
+      id: sendTransport.id,
+      iceParameters: sendTransport.iceParameters,
+      iceCandidates: sendTransport.iceCandidates,
+      dtlsParameters: sendTransport.dtlsParameters
+   });
+}
+
+const onConnectSendTransport = async (
+   socket: WebSocket,
+   data: ClientEventData<"CONNECT_SEND_TRANSPORT">
+) => {
+   await mediasoupServer.connectSendTransport(data.transportId, data.dtlsParameters);
+   socket.sendEvent("SEND_TRANSPORT_CONNECTED", null);
+}
+
+const onCreateRecvTransport = async (
+   socket: WebSocket,
+   data: ClientEventData<"CREATE_RECV_TRANSPORT">
+) => {
+   const recvTransport = await mediasoupServer.createRecvTransport(socket, data.deviceRtpCapabilities);
+   socket.sendEvent("RECV_TRANSPORT_CREATED", {
+      id: recvTransport.id,
+      iceParameters: recvTransport.iceParameters,
+      iceCandidates: recvTransport.iceCandidates,
+      dtlsParameters: recvTransport.dtlsParameters
+   });
+}
+
+const onConnectRecvTransport = async (
+   socket: WebSocket,
+   data: ClientEventData<"CONNECT_RECV_TRANSPORT">
+) => {
+   await mediasoupServer.connectRecvTransport(data.transportId, data.dtlsParameters);
+   socket.sendEvent("RECV_TRANSPORT_CONNECTED", null);
 }
 
 const onSocketDisconnected = (socket: WebSocket) => {

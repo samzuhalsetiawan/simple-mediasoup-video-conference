@@ -1,4 +1,5 @@
 import type { Router, RtpCapabilities, WebRtcTransport, Producer, Consumer } from "mediasoup/types";
+import { WebSocket } from "ws";
 
 export type WorkerAppData = {
    routers: Router<RouterAppData>[];

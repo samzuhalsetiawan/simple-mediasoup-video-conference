@@ -11,6 +11,8 @@ async function main() {
    socket.onopen = async () => {
       console.log(`[Socket Connected]`);
       await mediasoupClient.loadDevice(socket);
+      await mediasoupClient.createSendTransport(socket);
+      await mediasoupClient.createRecvTransport(socket);
    }
 
    socket.onmessage = (message) => {

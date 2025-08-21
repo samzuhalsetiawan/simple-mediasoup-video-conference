@@ -1,5 +1,5 @@
-import type { RouterOptions, WorkerSettings } from "mediasoup/types";
-import type { RouterAppData, WorkerAppData } from "./MediasoupAppData.ts";
+import type { RouterOptions, WebRtcTransportOptions, WorkerSettings } from "mediasoup/types";
+import type { RouterAppData, TransportAppData, WorkerAppData } from "./MediasoupAppData.ts";
 
 export const Configuration = {
    worker: {
@@ -36,4 +36,21 @@ export const Configuration = {
          recvTransports: []
       }
    } as RouterOptions<RouterAppData>,
+   getTransportOptions: <T extends TransportAppData>(appData: T): WebRtcTransportOptions<T> => {
+      return {
+         listenInfos: [
+            {
+               ip: "192.168.100.4",
+               announcedAddress: undefined,
+               protocol: "udp",
+               portRange: {
+                  min: 3100,
+                  max: 3200
+               }
+            }
+         ],
+         enableSctp: false,
+         appData
+      }
+   }
 }
