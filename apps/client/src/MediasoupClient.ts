@@ -62,7 +62,10 @@ export class MediasoupClient {
       });
       sendTransport.on("produce", async (data, callback, errback) => {
          try {
-            //TODO: Create Producer
+            const { appData, kind, rtpParameters } = data;
+            socket.sendEvent("CREATE_PRODUCER", { kind, rtpParameters, transportId: sendTransport.id });
+            const { producerId } = await socket.once("PRODUCER_CREATED");
+            callback({ id: producerId });
          } catch (error: any) {
             errback(error);
          }

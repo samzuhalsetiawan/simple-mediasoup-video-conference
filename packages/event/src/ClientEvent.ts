@@ -1,4 +1,4 @@
-import type { DtlsParameters, RtpCapabilities } from "mediasoup/types";
+import type { DtlsParameters, MediaKind, RtpCapabilities, RtpParameters } from "mediasoup/types";
 
 export type ClientEventName = Pick<ClientEvent, "name">["name"];
 export type ClientEventData<K extends ClientEventName> = Pick<Extract<ClientEvent, { name: K }>, "data">["data"];
@@ -29,5 +29,19 @@ export type ClientEvent =
    data: { 
       transportId: string,
       dtlsParameters: DtlsParameters
+   }
+}
+|{ 
+   name: "CREATE_PRODUCER",
+   data: { 
+      transportId: string,
+      kind: MediaKind,
+      rtpParameters: RtpParameters
+   }
+}
+|{
+   name: "PRODUCER_PRODUCE",
+   data: {
+      producerId: string
    }
 }

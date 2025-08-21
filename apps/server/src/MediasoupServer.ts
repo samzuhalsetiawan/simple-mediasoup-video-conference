@@ -1,5 +1,5 @@
 import mediasoup from "mediasoup";
-import type { Worker, Router, RtpCapabilities, WebRtcTransport, DtlsParameters } from "mediasoup/types";
+import type { Worker, Router, RtpCapabilities, WebRtcTransport, DtlsParameters, MediaKind, RtpParameters, Producer } from "mediasoup/types";
 import type { RecvTransportAppData, RouterAppData, SendTransportAppData, WorkerAppData } from "./MediasoupAppData.ts";
 import { Configuration } from "./MediasoupServerConfiguration.ts";
 import { WebSocket } from "ws";
@@ -84,6 +84,28 @@ export class MediasoupServer {
       } catch (error: any) {
          return Promise.reject(error);
       }
+   }
+
+   public async createProducer(transportId: string, kind: MediaKind, rtpParameters: RtpParameters): Promise<Producer> {
+      try {
+         const sendTransport = this.router.appData.sendTransports.find(transport => transport.id === transportId);
+         if (!sendTransport) throw new Error("Send Transport Not Found");
+         const producer = await sendTransport.produce({ kind, rtpParameters });
+         const producers = sendTransport.appData.producers;
+         producers.push(producer);
+         producer.on("transportclose", () => { producers.splice(producers.indexOf(producer), 1) });
+         return Promise.resolve(producer);
+      } catch (error: any) {
+         return Promise.reject(error);
+      }
+   }
+
+   public onProducerProduce(socket: WebSocket, producerId: string) {
+      this.router.appData.recvTransports.forEach(async recvTransport => {
+         if (recvTransport.appData.socket === socket) return;
+         const deviceRtpCapabilities = recvTransport.appData.deviceRtpCapabilities;
+         //TODO: Create Consumer
+      });
    }
 }
 

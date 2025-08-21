@@ -4,6 +4,10 @@ import "./utils/extentions.ts";
 import { MediasoupClient } from "./MediasoupClient.ts";
 
 async function main() {
+   const buttonShareCamera = document.querySelector("#btn-share-camera") as HTMLButtonElement;
+   const buttonShareScreen = document.querySelector("#btn-share-screen") as HTMLButtonElement;
+   const videoLocalVideo = document.querySelector(".local-video") as HTMLVideoElement;
+
    const socket = new WebSocket("http://localhost:3000/ws");
    const participants: Participant[] = [];
    const mediasoupClient = await MediasoupClient.initialize();
@@ -67,6 +71,32 @@ async function main() {
       divVideoContainer.appendChild(videoRemoteVideo);
       divRemoteContainer.appendChild(divVideoContainer);
    }
+
+   const sendStream = async (stream: MediaStream) => {
+      if (!mediasoupClient.sendTransport) return;
+      const [ videoTrack ] = stream.getVideoTracks();
+      const [ audioTrack ] = stream.getAudioTracks();
+      if (videoTrack) {
+         const videoProducer = await mediasoupClient.sendTransport.produce({ track: videoTrack });
+         socket.sendEvent("PRODUCER_PRODUCE", { producerId: videoProducer.id });
+      }
+      if (audioTrack) {
+         const audioProducer = await mediasoupClient.sendTransport.produce({ track: audioTrack });
+         socket.sendEvent("PRODUCER_PRODUCE", { producerId: audioProducer.id });
+      }
+   }
+
+   buttonShareCamera.addEventListener("click", async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      await sendStream(stream);
+      videoLocalVideo.srcObject = stream;
+   });
+
+   buttonShareScreen.addEventListener("click", async () => {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      await sendStream(stream);
+      videoLocalVideo.srcObject = stream;
+   });
 
 }
 

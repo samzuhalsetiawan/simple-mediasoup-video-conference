@@ -46,6 +46,12 @@ const onMessage = (socket: WebSocket, message: any) => {
       case "CONNECT_RECV_TRANSPORT":
          onConnectRecvTransport(socket, event.data);
          break;
+      case "CREATE_PRODUCER":
+         onCreateProducer(socket, event.data);
+         break;
+      case "PRODUCER_PRODUCE":
+         onProducerProduce(socket, event.data);
+         break;
    }
 }
 
@@ -96,6 +102,22 @@ const onConnectRecvTransport = async (
 ) => {
    await mediasoupServer.connectRecvTransport(data.transportId, data.dtlsParameters);
    socket.sendEvent("RECV_TRANSPORT_CONNECTED", null);
+}
+
+const onCreateProducer = async (
+   socket: WebSocket,
+   data: ClientEventData<"CREATE_PRODUCER">
+) => {
+   const { transportId, kind, rtpParameters } = data
+   const producer = await mediasoupServer.createProducer(transportId, kind, rtpParameters);
+   socket.sendEvent("PRODUCER_CREATED", { producerId: producer.id });
+}
+
+const onProducerProduce = (
+   socket: WebSocket,
+   data: ClientEventData<"PRODUCER_PRODUCE">
+) => {
+   mediasoupServer.onProducerProduce(socket, data.producerId);
 }
 
 const onSocketDisconnected = (socket: WebSocket) => {

@@ -53,3 +53,9 @@ export type ServerEvent =
    name: "RECV_TRANSPORT_CONNECTED",
    data: null
 }
+|{
+   name: "PRODUCER_CREATED",
+   data: {
+      producerId: string
+   }
+}
