@@ -13,6 +13,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
+    "@mediasoup-tutorial/event": "workspace:*",
     "mediasoup-client": "^3.15.2"
   },
   "devDependencies": {

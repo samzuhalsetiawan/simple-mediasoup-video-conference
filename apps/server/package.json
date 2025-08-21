@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch ./src/index.ts",
+    "dev": "DEBUG=\"mediasoup*\" node --watch ./src/index.ts",
     "start": "node ./src/index.ts"
   },
   "keywords": [],
@@ -13,6 +13,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
+    "@mediasoup-tutorial/event": "workspace:*",
     "mediasoup": "^3.18.0",
     "uuid": "^11.1.0",
     "ws": "^8.18.3"
