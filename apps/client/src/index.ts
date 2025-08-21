@@ -17,6 +17,7 @@ async function main() {
       await mediasoupClient.loadDevice(socket);
       await mediasoupClient.createSendTransport(socket);
       await mediasoupClient.createRecvTransport(socket);
+      socket.sendEvent("REQUEST_UPDATE_CONSUMER", null);
    }
 
    socket.onmessage = (message) => {
@@ -28,6 +29,9 @@ async function main() {
          break;
          case "NEW_SOCKET_JOINED":
             onNewSocketJoined(socket, event.data);
+         break;
+         case "CREATE_CONSUMER":
+            onCreateConsumer(socket, event.data);
          break;
          case "SOCKET_LEFT":
             onSocketLeft(socket, event.data);
@@ -46,6 +50,22 @@ async function main() {
          mediaStream: new MediaStream()
       });
       showRemoteVideo(data.socketId);
+   }
+
+   const onCreateConsumer = async (socket: WebSocket, data: ServerEventData<"CREATE_CONSUMER">) => {
+      const consumer = await mediasoupClient.createConsumer(data.id, data.producerId, data.kind, data.rtpParameters);
+      const { track: newTrack } = consumer;
+      const participant = participants.find(participant => participant.socketId === data.socketId);
+      if (!participant) return;
+      let oldTrack: MediaStreamTrack[]
+      if (consumer.kind === "video") {
+         oldTrack = participant.mediaStream.getVideoTracks()
+      } else {
+         oldTrack = participant.mediaStream.getAudioTracks();
+      }
+      oldTrack.forEach(track => participant.mediaStream.removeTrack(track));
+      participant.mediaStream.addTrack(newTrack);
+      socket.sendEvent("RESUME_CONSUMER", { consumerId: consumer.id });
    }
 
    const onSocketLeft = (socket: WebSocket, data: ServerEventData<"SOCKET_LEFT">) => {

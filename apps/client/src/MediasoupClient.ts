@@ -1,5 +1,5 @@
 import { Device } from "mediasoup-client";
-import type { Transport } from "mediasoup-client/types";
+import type { Consumer, MediaKind, RtpParameters, Transport } from "mediasoup-client/types";
 
 export class MediasoupClient {
    private readonly device: Device;
@@ -102,6 +102,23 @@ export class MediasoupClient {
             errback(error);
          }
       });
+   }
+
+   public async createConsumer(
+      consumerId: string,
+      producerId: string,
+      kind: MediaKind,
+      rtpParameters: RtpParameters
+   ): Promise<Consumer> {
+      try {
+         if (!this.recvTransport) throw new Error("Recv Transport is null");
+         const consumer = await this.recvTransport.consume({
+            id: consumerId, producerId, kind, rtpParameters
+         });
+         return Promise.resolve(consumer);
+      } catch (error: any) {
+         return Promise.reject(error);
+      }
    }
 
 }

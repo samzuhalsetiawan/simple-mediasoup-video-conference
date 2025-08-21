@@ -45,3 +45,13 @@ export type ClientEvent =
       producerId: string
    }
 }
+|{
+   name: "RESUME_CONSUMER",
+   data: {
+      consumerId: string
+   }
+}
+|{
+   name: "REQUEST_UPDATE_CONSUMER",
+   data: null
+}

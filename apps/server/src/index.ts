@@ -52,6 +52,12 @@ const onMessage = (socket: WebSocket, message: any) => {
       case "PRODUCER_PRODUCE":
          onProducerProduce(socket, event.data);
          break;
+      case "RESUME_CONSUMER":
+         onResumeConsumer(socket, event.data);
+         break;
+      case "REQUEST_UPDATE_CONSUMER":
+         onRequestUpdateConsumer(socket, event.data);
+         break;
    }
 }
 
@@ -118,6 +124,20 @@ const onProducerProduce = (
    data: ClientEventData<"PRODUCER_PRODUCE">
 ) => {
    mediasoupServer.onProducerProduce(socket, data.producerId);
+}
+
+const onResumeConsumer = async (
+   socket: WebSocket,
+   data: ClientEventData<"RESUME_CONSUMER">
+) => {
+   await mediasoupServer.resumeConsumer(socket, data.consumerId);
+}
+
+const onRequestUpdateConsumer = (
+   socket: WebSocket,
+   data: ClientEventData<"REQUEST_UPDATE_CONSUMER">
+) => {
+   mediasoupServer.onRequestUpdateConsumer(socket);
 }
 
 const onSocketDisconnected = (socket: WebSocket) => {

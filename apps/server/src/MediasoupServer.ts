@@ -1,5 +1,5 @@
 import mediasoup from "mediasoup";
-import type { Worker, Router, RtpCapabilities, WebRtcTransport, DtlsParameters, MediaKind, RtpParameters, Producer } from "mediasoup/types";
+import type { Worker, Router, RtpCapabilities, WebRtcTransport, DtlsParameters, MediaKind, RtpParameters, Producer, Consumer } from "mediasoup/types";
 import type { RecvTransportAppData, RouterAppData, SendTransportAppData, WorkerAppData } from "./MediasoupAppData.ts";
 import { Configuration } from "./MediasoupServerConfiguration.ts";
 import { WebSocket } from "ws";
@@ -104,8 +104,74 @@ export class MediasoupServer {
       this.router.appData.recvTransports.forEach(async recvTransport => {
          if (recvTransport.appData.socket === socket) return;
          const deviceRtpCapabilities = recvTransport.appData.deviceRtpCapabilities;
-         //TODO: Create Consumer
+         await this.createConsumer(recvTransport, producerId, deviceRtpCapabilities);
       });
+   }
+
+   private async createConsumer(
+      recvTransport: WebRtcTransport<RecvTransportAppData>,
+      producerId: string,
+      deviceRtpCapabilities: RtpCapabilities
+   ): Promise<Consumer | null> {
+      try {
+         const canConsume = this.router.canConsume({ producerId, rtpCapabilities: deviceRtpCapabilities });
+         if (!canConsume) return Promise.resolve(null);
+         const consumer = await recvTransport.consume({
+            producerId,
+            rtpCapabilities: recvTransport.appData.deviceRtpCapabilities,
+            paused: true
+         });
+         const consumers = recvTransport.appData.consumers;
+         consumers.push(consumer);
+         consumer.on("transportclose", () => {
+            if (consumers.indexOf(consumer) === -1) return;
+            consumers.splice(consumers.indexOf(consumer), 1);
+         });
+         consumer.on("producerclose", () => {
+            if (consumers.indexOf(consumer) === -1) return;
+            consumers.splice(consumers.indexOf(consumer), 1);
+         });
+         const producerSocketId = this.router.appData.sendTransports
+            .find(transport => transport.appData.producers.some(producer => producer.id === producerId))
+            ?.appData.socket.id;
+         if (!producerSocketId) return Promise.reject(new Error("Producer Socket ID Not Found"));
+         recvTransport.appData.socket.sendEvent("CREATE_CONSUMER", {
+            socketId: producerSocketId,
+            id: consumer.id,
+            producerId,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters
+         });
+         return Promise.resolve(consumer);
+      } catch (error: any) {
+         return Promise.reject(error);
+      }
+   }
+
+   public async resumeConsumer(socket: WebSocket, consumerId: string) {
+      const recvTransport = this.router.appData.recvTransports
+         .filter(transport => transport.appData.socket === socket)[0];
+      if (!recvTransport) return;
+      const consumer = recvTransport.appData.consumers.find(consumer => consumer.id === consumerId);
+      if (!consumer) return;
+      await consumer.resume()
+   }
+
+   public onRequestUpdateConsumer(socket: WebSocket) {
+      const recvTransport = this.router.appData.recvTransports.find(transport => transport.appData.socket === socket);
+      if (!recvTransport) return;
+      this.router.appData.sendTransports
+         .filter(transport => transport.appData.socket !== socket)
+         .forEach(sendTransport => {
+            sendTransport.appData.producers.forEach(async producer => {
+               if (producer.closed) return;
+               await this.createConsumer(
+                  recvTransport,
+                  producer.id,
+                  recvTransport.appData.deviceRtpCapabilities
+               );
+            });
+         });
    }
 }
 

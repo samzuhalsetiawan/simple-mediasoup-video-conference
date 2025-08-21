@@ -1,4 +1,4 @@
-import type { DtlsParameters, IceCandidate, IceParameters, RtpCapabilities } from "mediasoup/types";
+import type { DtlsParameters, IceCandidate, IceParameters, MediaKind, RtpCapabilities, RtpParameters } from "mediasoup/types";
 
 export type ServerEventName = Pick<ServerEvent, "name">["name"];
 export type ServerEventData<K extends ServerEventName> = Pick<Extract<ServerEvent, { name: K }>, "data">["data"];
@@ -57,5 +57,15 @@ export type ServerEvent =
    name: "PRODUCER_CREATED",
    data: {
       producerId: string
+   }
+}
+|{
+   name: "CREATE_CONSUMER",
+   data: {
+      socketId: string
+      id: string,
+      producerId: string,
+      kind: MediaKind,
+      rtpParameters: RtpParameters,
    }
 }
